@@ -1,73 +1,57 @@
+// app/components/GuildList.tsx
 "use client"
 
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
-interface BotConfigInfo {
+type Guild = {
+  id: string
+  name: string
+  icon?: string
+}
+
+type BotConfig = {
   serverId: string
   fileName: string
 }
 
-export default function GuildList() {
-  const { data: session } = useSession()
-  const [guilds, setGuilds] = useState<any[]>([])
-  const [botConfigs, setBotConfigs] = useState<BotConfigInfo[]>([])
-  const [selectedConfig, setSelectedConfig] = useState<any>(null)
+export default function GuildList({
+  onSelect,
+}: {
+  onSelect: (serverId: string) => void
+}) {
+  const [guilds, setGuilds] = useState<Guild[]>([])
+  const [botConfigs, setBotConfigs] = useState<BotConfig[]>([])
 
-  // Discord guilds
   useEffect(() => {
-    const token = (session as any)?.accessToken
-    if (!token) return
-
-    fetch("https://discord.com/api/users/@me/guilds", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    // 所属サーバー一覧
+    fetch("/api/discord/guilds")
       .then(res => res.json())
       .then(data => setGuilds(data))
-      .catch(console.error)
-  }, [session])
 
-  // botConfigs
-  useEffect(() => {
+    // JSONファイル一覧
     fetch("/api/botConfigs")
       .then(res => res.json())
       .then(data => setBotConfigs(data))
-      .catch(console.error)
   }, [])
 
-  const handleClick = (serverId: string) => {
-    const config = botConfigs.find(c => c.serverId === serverId)
-    if (!config) return
-
-    fetch(`/botConfigs/${config.fileName}`)
-      .then(res => res.json())
-      .then(data => setSelectedConfig(data))
-      .catch(console.error)
-  }
-
-  if (!session) return null
-
   return (
-    <div>
-      <ul>
-        {guilds.map(g => {
-          const hasConfig = botConfigs.some(c => c.serverId === g.id)
-          return (
-            <li key={g.id}>
-              <button
-                disabled={!hasConfig}
-                onClick={() => handleClick(g.id)}
-              >
-                {g.name} {hasConfig ? "(設定あり)" : ""}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-
-      {selectedConfig && (
-        <pre>{JSON.stringify(selectedConfig, null, 2)}</pre>
-      )}
-    </div>
+    <ul>
+      {guilds.map(g => {
+        const hasConfig = botConfigs.some(c => c.serverId === g.id)
+        return (
+          <li key={g.id}>
+            <button
+              className={`block w-full text-left p-2 rounded ${
+                hasConfig ? "hover:bg-blue-100" : "text-gray-400 cursor-not-allowed"
+              }`}
+              onClick={() => hasConfig && onSelect(g.id)}
+              disabled={!hasConfig}
+            >
+              {g.name}
+            </button>
+          </li>
+        )
+      })}
+    </ul>
   )
 }

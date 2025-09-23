@@ -4,7 +4,7 @@ import path from "path"
 
 export async function GET(req: Request, { params }: { params: { fileName: string } }) {
   const { fileName } = params
-  const filePath = path.join(process.cwd(), "botConfigsData", fileName)
+  const filePath = path.join(process.env.BOT_CONFIGS_PATH!, fileName)
 
   if (!fs.existsSync(filePath)) {
     return NextResponse.json({ error: "File not found" }, { status: 404 })
