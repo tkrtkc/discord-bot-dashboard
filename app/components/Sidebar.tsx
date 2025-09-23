@@ -1,19 +1,57 @@
 "use client"
 
-import { useCallback } from "react"
 import GuildList from "./GuildList"
+import { useEffect, useState } from "react"
+import { useSession} from "next-auth/react"
 
-export default function Sidebar({ setSelectedConfig }: { setSelectedConfig: (config: any) => void }) {
-  const handleSelect = useCallback(async (serverId: string) => {
-    const res = await fetch(`/api/botConfigs/${serverId}_server_info.json`)
-    const data = await res.json()
-    setSelectedConfig(data)
-  }, [setSelectedConfig])
+type Guild = {
+  id: string
+  name: string
+  icon?: string
+}
+
+type BotConfig = {
+  serverId: string
+  fileName: string
+}
+
+export default function Sidebar({ setSelectedServerId }: { setSelectedServerId: (config: any) => void }) {
+
+  const { data: session} = useSession()
+  const [guilds, setGuilds] = useState<Guild[]>([])
+  const [botConfigs, setBotConfigs] = useState<BotConfig[]>([])
+  useEffect(() => {
+
+    // 所属サーバー一覧
+    fetch("/api/discord/guilds")
+      .then(res => res.json())
+      .then(data => setGuilds(data))
+
+    // JSONファイル一覧
+    fetch("/api/botConfigs")
+      .then(res => res.json())
+      .then(data => setBotConfigs(data))
+  }, [])
+  if (!session) {
+    return (
+    <div>
+      <h2>サーバー一覧</h2>
+    </div>
+    )
+  }
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-2">サーバー一覧</h2>
-      <GuildList onSelect={handleSelect} />
+      <h2>サーバー一覧</h2>
+      <GuildList
+        guilds={guilds}
+        botConfigs={botConfigs}
+        onSelect={async (serverId: string) => {
+          // const res = await fetch(`/api/botConfigs/${serverId}_server_info.json`)
+          // const data = await res.json()
+          setSelectedServerId(serverId)
+        }}
+      />
     </div>
   )
 }
