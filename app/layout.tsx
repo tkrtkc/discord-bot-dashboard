@@ -3,7 +3,7 @@
 import { useSession} from "next-auth/react"
 import { useState } from "react"
 import React from "react" 
-// import "./globals.css"
+import "./globals.css"
 import { SessionProvider } from "next-auth/react"
 import Header from "./components/Header"
 import Sidebar from "./components/Sidebar"
