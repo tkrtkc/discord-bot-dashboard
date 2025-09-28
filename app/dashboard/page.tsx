@@ -1,16 +1,35 @@
-// app/dashboard/page.tsx
-"use client"
+'use client'
 
-import { useState } from "react"
-import ServerInfo from "./components/ServerInfo"
+import { useEffect, useState } from 'react'
+import { useSelectedServer } from '../context/SelectedServerContext'
+import ServerInfo from './components/ServerInfo'
 
 export default function DashboardPage() {
-  const [selectedConfig, setSelectedConfig] = useState<any>(null)
+  const { selectedServerId } = useSelectedServer()
+  const [loading, setLoading] = useState(false)
+  const [serverConfig, setServerConfig] = useState<any>(null); 
+
+  useEffect(() => {
+    if (!selectedServerId) {
+      setServerConfig(null)
+      return
+    }
+
+    setLoading(true)
+    fetch(`/api/botConfigs/${selectedServerId}`)
+      .then(res => res.json())
+      .then(json => setServerConfig(json))
+      .finally(() => setLoading(false))
+  }, [selectedServerId])
+
+  if (!selectedServerId) return <div>サーバーを選択してください</div>
+  if (loading) return <div>読み込み中...</div>
+  if (!serverConfig) return <div>設定が見つかりません</div>
 
   return (
-    <div className="flex flex-col h-full">
-      {/* 選択されたサーバー情報を表示 */}
-      <ServerInfo config={selectedConfig} />
+    <div className="p-4">
+      <h1>サーバーID: {selectedServerId}</h1>
+      <ServerInfo config = {serverConfig}/>
     </div>
   )
 }
