@@ -1,8 +1,10 @@
 "use client"
 
-import GuildList from "./GuildList"
-import { useEffect, useState } from "react"
 import { useSession} from "next-auth/react"
+import GuildList from './GuildList'
+import { useEffect, useState } from 'react'
+import { useSelectedServer } from '../context/SelectedServerContext'
+import { useRouter } from "next/navigation"
 
 type Guild = {
   id: string
@@ -14,12 +16,17 @@ type BotConfig = {
   serverId: string
   fileName: string
 }
+  
 
-export default function Sidebar({ setSelectedServerId }: { setSelectedServerId: (config: any) => void }) {
+export default function Sidebar() {
 
   const { data: session} = useSession()
-  const [guilds, setGuilds] = useState<Guild[]>([])
-  const [botConfigs, setBotConfigs] = useState<BotConfig[]>([])
+  
+  const { setSelectedServerId } = useSelectedServer()
+  const [guilds, setGuilds] = useState<any[]>([])
+  const [botConfigs, setBotConfigs] = useState<any[]>([])
+  const router = useRouter()
+ 
   useEffect(() => {
 
     // 所属サーバー一覧
@@ -32,6 +39,7 @@ export default function Sidebar({ setSelectedServerId }: { setSelectedServerId: 
       .then(res => res.json())
       .then(data => setBotConfigs(data))
   }, [])
+
   if (!session) {
     return (
     <div>
@@ -46,10 +54,10 @@ export default function Sidebar({ setSelectedServerId }: { setSelectedServerId: 
       <GuildList
         guilds={guilds}
         botConfigs={botConfigs}
-        onSelect={async (serverId: string) => {
-          // const res = await fetch(`/api/botConfigs/${serverId}_server_info.json`)
-          // const data = await res.json()
+        onSelect={(serverId: string) => {
+          console.log('Sidebar clicked', serverId)
           setSelectedServerId(serverId)
+          router.push('/dashboard')
         }}
       />
     </div>

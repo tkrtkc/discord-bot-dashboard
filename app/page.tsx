@@ -1,8 +1,11 @@
 "use client"
 
+import DashboardPage from './dashboard/page'
+import { useSelectedServer } from './context/SelectedServerContext'
 import { useSession, signIn} from "next-auth/react"
 
 export default function Page() {
+  const { selectedServerId } = useSelectedServer()
   const { data: session, status } = useSession()
 
   if (status === "loading") {

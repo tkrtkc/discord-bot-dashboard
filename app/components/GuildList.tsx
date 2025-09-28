@@ -1,4 +1,3 @@
-// app/components/GuildList.tsx
 "use client"
 
 type Guild = { id: string; name: string }
