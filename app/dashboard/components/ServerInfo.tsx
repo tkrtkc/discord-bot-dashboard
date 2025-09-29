@@ -1,10 +1,22 @@
 "use client"
 
 import React, { useState } from "react";
+import { useEffect } from "react";
+import VvEngineSpeakers from "./VvEngineSpeakers"
 
 type ServerInfoProps = {
   data: any; 
 };
+type SpeakerStyle = {
+  id: number;
+  name: string;
+};
+type Speaker = {
+  name: string;
+  speaker_uuid: string;
+  styles: SpeakerStyle[];
+};
+
 
 export default function ServerInfo({ config }: any) {
   if (!config) return <p>サーバーを選択してください</p>
@@ -33,7 +45,11 @@ export default function ServerInfo({ config }: any) {
         placeholder="例: 12345"
         aria-label="整数入力"
       /></h3>
-      <h3 className="mt-4 font-semibold">デフォルト話者: {localConfig.defaultSpeakerId}</h3>
+      <h3 className="mt-4 font-semibold">デフォルト話者:</h3>
+      <VvEngineSpeakers
+        defaultId={localConfig["defaultSpeakerId"]}
+        onChange={(id) => updateRootConfig("defaultSpeakerId", Number(id))}
+      />
       <h3 className="mt-4 font-semibold">読み上げ速度: {localConfig.playbackSpeed}</h3>
       <h3 className="mt-4 font-semibold">読み上げチャンネル一覧:</h3>
       <ul>
