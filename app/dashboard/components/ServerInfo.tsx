@@ -55,7 +55,7 @@ export default function ServerInfo({ config }: any) {
       /></h3>
       <h3 className="mt-4 font-semibold">読み上げ速度: <input
         id="float"
-        type="decimal"
+        type="number"
         step="0.1"
         inputMode="numeric"
         value={localConfig.playbackSpeed}
