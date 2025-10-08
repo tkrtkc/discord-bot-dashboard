@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/authOptions"
+import { NextResponse } from "next/server"
 
 export const GET = async () => {
   const session = await getServerSession(authOptions)
@@ -10,6 +11,7 @@ export const GET = async () => {
     });
   }
 
+  // DiscordのAPIを実行
   const res = await fetch("https://discord.com/api/users/@me/guilds", {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
@@ -17,20 +19,9 @@ export const GET = async () => {
   });
 
   if (!res.ok) {
-    const guildsData = await res.json();
-
-    // 配列かどうか確認して、配列でない場合は空配列にする
-    const guilds = Array.isArray(guildsData) ? guildsData : [];
-
-    return new Response(JSON.stringify(guilds), {
-    headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json([], { status: res.status }) // 空配列返す
   }
 
-  const guilds = await res.json();
-
-  // guilds は配列になるはず
-  return new Response(JSON.stringify(guilds), {
-    headers: { "Content-Type": "application/json" },
-  });
+  const guilds = await res.json()
+  return NextResponse.json(guilds)
 };
