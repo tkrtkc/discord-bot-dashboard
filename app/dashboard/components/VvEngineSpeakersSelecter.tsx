@@ -18,7 +18,7 @@ type SpeakerSelectProps = {
   onChange?: (id: number) => void;
 };
 
-export default function VvEngineSpeakers({ defaultId, onChange }: SpeakerSelectProps) {
+export default function VvEngineSpeakersSelecter({ defaultId, onChange }: SpeakerSelectProps) {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(defaultId ?? null);
 
